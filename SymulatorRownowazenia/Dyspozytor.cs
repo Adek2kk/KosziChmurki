@@ -48,7 +48,7 @@ namespace SymulatorRownowazenia
 
                     //Wczytanie zadań
                     String line = sr.ReadLine();
-                    Int32.TryParse(line.Split(',')[1], out itmp);
+                    Int32.TryParse(line.Split(',')[0], out itmp);
                     iloscuslug = itmp;
                     Console.WriteLine(line);
                     while ((line = sr.ReadLine()) != null)
