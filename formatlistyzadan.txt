@@ -1,0 +1,4 @@
+[Liczba oznaczaj¹ca iloœæ ró¿nych us³ug]
+[Liczba - ID zadania],[Liczba - chwila nadejœcia],[Liczba - wymagany czas przetwarzania],[Liczba - ID wymaganej us³ugi]
+...
+//¯adnych spacji, wszystko liczby ca³kowite.
