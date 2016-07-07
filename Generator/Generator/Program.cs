@@ -82,7 +82,7 @@ namespace Generator
 
 
             NormalData gen = new NormalData(mean, stddev, 1);
-            
+
 
             List<double> starterSequence = gen.NormalList(czas);
             GrupaObciazen nowaGrupa = new GrupaObciazen(stddev, mean, czas);
@@ -90,43 +90,43 @@ namespace Generator
             for (int i = 0; i < korelacje_grup.Count(); i++)
             {
                 startery.Add(nowaGrupa.generujPrzebieg(starterSequence, korelacje_grup[i]));
-               
+
             }
-            
-             for (int i = 0; i < korelacje_w_grupie.Count(); i++)
-             {
-                 List<List<double>> tempo = new List<List<double>>();
+
+            for (int i = 0; i < korelacje_w_grupie.Count(); i++)
+            {
+                List<List<double>> tempo = new List<List<double>>();
                 tempo.Add(startery[i]);
                 for (int j = 0; j < korelacje_w_grupie[i].Count(); j++)
-                 {
-                     //if(i==0)
-                     Console.Write(korelacje_w_grupie[i][j]);
-                    
+                {
+                    //if(i==0)
+                    Console.Write(korelacje_w_grupie[i][j]);
+
                     tempo.Add(nowaGrupa.generujPrzebieg(startery[i], korelacje_w_grupie[i][j]));
 
-                 }
-                 przebiegi.Add(tempo);
-             }
+                }
+                przebiegi.Add(tempo);
+            }
             // do pliku obciazenia zapisywane są obciążenia generowane przez kolejne usługi w kolejnych jednostkach czasu, w kolejnych wierszach kolejne usługi
             string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             using (StreamWriter outputFile = new StreamWriter(mydocpath + @"\Obciazenia.txt"))
             {
                 for (int i = 0; i < liczba_grup; i++)
                 {
-                   Console.WriteLine();
-                   
+                    Console.WriteLine();
+
                     for (int j = 0; j < liczb_podlist_w_grupie; j++)
                     {
                         Console.WriteLine();
-                        
+
                         for (int k = 0; k < czas; k++)
                         {
-                            Console.Write(przebiegi[i][j][k] +";");
-                            double temphelp = przebiegi[i][j][k] + mean + 2*stddev;
+                            Console.Write(przebiegi[i][j][k] + ";");
+                            double temphelp = przebiegi[i][j][k] + mean + 2 * stddev;
                             outputFile.Write(temphelp + ";");
 
                         }
-                        
+
                     }
                 }
 
@@ -134,12 +134,15 @@ namespace Generator
             // do Zadania_gen zapisujemy, w pierwszym wierszu czas przez jaki generujemy zadania, liczbę grup, liczbę usług w grupie, w kolejnych id_zadania;czas w którym sie pojawia;długosc;grupa|numer_w_grupie
             using (StreamWriter outputFile = new StreamWriter(mydocpath + @"\Zadania_gen.txt"))
             {
+                int bezw_numer_uslugi = 0;
 
-                outputFile.WriteLine(czas.ToString() + ";" + liczba_grup.ToString() + ";" + liczb_podlist_w_grupie.ToString());
+                outputFile.WriteLine(czas.ToString()+","+ liczba_grup.ToString()+","+liczb_podlist_w_grupie.ToString());
+
+
                 for (int i = 0; i < liczba_grup; i++)
                 {
                     for (int j = 0; j < liczb_podlist_w_grupie; j++)
-                    {                     
+                    {
                         for (int k = 0; k < czas; k++)
                         {
                             Console.Write(przebiegi[i][j][k] + ";");
@@ -147,13 +150,13 @@ namespace Generator
                             while (temphelp > 0)
                             {
                                 double helper = wykladniczy_rand.NextData();
-                                outputFile.Write(idzadania.ToString() + ";" + k.ToString() + ";" +Convert.ToInt32(helper).ToString("F1") + ";" + i.ToString()+"|"+j.ToString() + "\n");
+                                outputFile.WriteLine(idzadania.ToString() + "," + k.ToString() + "," + Convert.ToInt32(helper).ToString("F0") + "," + bezw_numer_uslugi.ToString());
                                 temphelp -= helper;
                                 idzadania++;
                             }
-                            
-                            
+
                         }
+                        bezw_numer_uslugi++;
 
                     }
                 }
@@ -164,7 +167,7 @@ namespace Generator
 #if DEBUG
             Console.WriteLine("Press enter to close...");
             Console.ReadLine();
-            #endif
+#endif
         }
     }
 

@@ -34,11 +34,11 @@ namespace SymulatorRownowazenia
         {
 
             try
-            {   using (StreamReader sr = new StreamReader("Zadania.txt"))
+            {   using (StreamReader sr = new StreamReader("Zadania_gen.txt"))
                 {
                     Zegar = 0;
                     string stmp;
-                    int itmp;
+                    int itmp, itmp2;
                     int iloscuslug;
                     ZadaniaDoWykonania = new List<Podzadanie>();
                     ZadaniaPrzetwarzane = new List<Zadanie>();
@@ -48,8 +48,11 @@ namespace SymulatorRownowazenia
 
                     //Wczytanie zadań
                     String line = sr.ReadLine();
-                    Int32.TryParse(line.Split(',')[0], out itmp);
-                    iloscuslug = itmp;
+                    //Pobieramy ilość grup
+                    Int32.TryParse(line.Split(',')[1], out itmp);
+                    //Pobieramy ilość usług w każdej grupie
+                    Int32.TryParse(line.Split(',')[2], out itmp2);
+                    iloscuslug = itmp * itmp2;
                     Console.WriteLine(line);
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -77,8 +80,8 @@ namespace SymulatorRownowazenia
 
                     LicznoscKworum = itmp;
                     //Tworzymy listę na której zaznaczać będziemy ilości wystąpień poszczególnych usług
-                    int[] wystapienia = new int[iloscuslug+1];
-                    for (int i = 0; i <= iloscuslug; i++)
+                    int[] wystapienia = new int[iloscuslug];
+                    for (int i = 0; i < iloscuslug; i++)
                     {
                         wystapienia[i] = 0;
                     }
@@ -95,7 +98,7 @@ namespace SymulatorRownowazenia
                         nowywezel.ObslugiwaneUslugi = new List<int>();
 
                         Console.Write("Proszę podać listę usług ulokowanych na tym węźle w formie u1,u2,u3,u4...");
-                        Console.Write("Przypomnienie: Zadeklarowane jest " + (iloscuslug+1).ToString() + " usług. Podawaj więc numery od 0 do " + (iloscuslug).ToString());
+                        Console.Write("Przypomnienie: Zadeklarowane jest " + (iloscuslug).ToString() + " usług. Podawaj więc numery od 0 do " + (iloscuslug-1).ToString());
 
                         stmp = Console.ReadLine();
 
@@ -160,6 +163,14 @@ namespace SymulatorRownowazenia
 
         public void Simulate()
         {
+            Console.WriteLine("Trwa sortowanie zadań po chwili nadejścia.");
+            ZadaniaDoWykonania = ZadaniaDoWykonania.OrderBy(e => e.ChwilaNadejscia).ToList();
+
+            foreach (Podzadanie zad in ZadaniaDoWykonania)
+            { Console.WriteLine(zad.IDZadania + "," + zad.ChwilaNadejscia + "," + zad.CzasPrzetwarzania + "," + zad.IDuslugi); }
+
+            Console.WriteLine("Trwa przetwarzanie.");    
+
             while (ZadaniaDoWykonania.Count > 0 || ZadaniaPrzetwarzane.Count > 0)
             {
                 //Nadeszło zadanie. Dodajemy je do odpowiedniej listy i rozmieszczamy na węzłach.
