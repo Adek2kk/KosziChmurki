@@ -7,6 +7,8 @@ namespace Node_generator
     {
         public enum Distribution { Random, Negative, Positive }
         public int NodesCount { get; set; }
+        public int ParallelComputingPotential { get; set; }
+        public int ComputingPower { get; set; }
         public int ServicesPerNodeCount { get; set; }
         public Services Services { get; set; }
 
@@ -35,13 +37,12 @@ namespace Node_generator
                 var nodeProperties = new List<string>();
                 // node id
                 nodeProperties.Add(nodeId.ToString());
-                /*int availableServicesCount = GetValueForDistribution(servicesDistribution, 1, Services.GroupsCount);
                 // computing power
-                nodeProperties.Add(GetValueForDistribution(computingPowerDistribution, 1, DefaultComputingPower));
+                nodeProperties.Add(ComputingPower.ToString());
                 // parallel computing potential
-                nodeProperties.Add(GetValueForDistribution(parallelComputingPotentialDistribution, 1, availableServicesCount));
+                nodeProperties.Add(ParallelComputingPotential.ToString());
                 // liczba obsługiwanych węzłów
-                nodeProperties.Add(availableServicesCount);*/
+                nodeProperties.Add(ServicesPerNodeCount.ToString());
                 var assignedServices = new List<int>();
                 while (assignedServices.Count != ServicesPerNodeCount) 
                 {
@@ -64,7 +65,7 @@ namespace Node_generator
                 }
                 foreach (var serviceId in assignedServices) 
                 {
-                    nodeProperties.Add(Services.GetCoord(serviceId));
+                    nodeProperties.Add(serviceId.ToString());
                 }
                 outputList.Add(String.Join(" ", nodeProperties));
             }

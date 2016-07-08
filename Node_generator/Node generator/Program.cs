@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Node_generator
 {
@@ -10,6 +11,10 @@ namespace Node_generator
             generator = new Generator();
             Console.WriteLine("Podaj liczbę węzłów:");
             generator.NodesCount = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Podaj domyślną moc węzłów:");
+            generator.ComputingPower = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Podaj domyślną liczbę jednocześnie przetwarzanych procesów:");
+            generator.ParallelComputingPotential = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Podaj liczbę usług na węźle:");
             generator.ServicesPerNodeCount = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Podaj liczbę grup usług:");
@@ -34,9 +39,12 @@ namespace Node_generator
             generator.Services.CalculateCorrelations();
 
             Console.WriteLine("Podaj typ rozkładu usług (0 - Random, 1 - Negative Correlation, 2 -  Postive Correlation):");
-            foreach (var line in generator.Generate((Generator.Distribution)Convert.ToInt32(Console.ReadLine())))
+            using (var writer = new StreamWriter("output.txt"))
             {
-                Console.WriteLine(line);
+                foreach (var line in generator.Generate((Generator.Distribution)Convert.ToInt32(Console.ReadLine())))
+                {
+                    writer.WriteLine(line);
+                }
             }
         }
 
