@@ -354,8 +354,56 @@ namespace SymulatorRownowazenia
 
             }
 
+            int max, min , sum, n;
+            string ocz;
 
+            using (var writer = new StreamWriter("zadaniaOczekiwanie.csv"))
+            {
+                writer.WriteLine("zadanie;max;min;avg;rest;");
+                foreach (Zadanie ukonczone in ZadaniaZakonczone)
+                {
+                    max = -1;
+                    min = -1;
+                    sum = 0;
+                    n = 0;
+                    ocz = "";
 
+                    foreach (Podzadanie pukonczone in ukonczone.Podzadania)
+                    {
+                        if (max < pukonczone.CzasOczekiwania)
+                            max = pukonczone.CzasOczekiwania;
+                        if (min == -1)
+                            min = pukonczone.CzasOczekiwania;
+                        else if (min > pukonczone.CzasOczekiwania)
+                            min = pukonczone.CzasOczekiwania;
+                        sum += pukonczone.CzasOczekiwania;
+                        n++;
+                        ocz += pukonczone.CzasOczekiwania + ";";
+                    }
+
+                    writer.WriteLine(ukonczone.IDZadania.ToString() + "; " + max + "; " + min + "; " + sum/n + "; " + ocz);
+                    
+                }
+               
+            }
+            string uslugi;
+            using (var writer = new StreamWriter("wezly.csv"))
+            {
+                writer.WriteLine("zegar;" + Zegar);
+                writer.WriteLine("wezel;noActive;services");
+                
+                foreach (Wezel wez in Wezly)
+                {
+                    uslugi = "";
+                    foreach (int usg in wez.ObslugiwaneUslugi)
+                    {
+                        uslugi += usg + ",";
+                    }                    
+                    writer.WriteLine(wez.IDWezla + ";" + wez.CzasNieaktywnosci + ";" + uslugi + ";");
+
+                }
+
+            }
 
 
         }
