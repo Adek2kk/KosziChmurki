@@ -387,10 +387,11 @@ namespace SymulatorRownowazenia
                
             }
             string uslugi;
+            int wykonaneJednostki;
             using (var writer = new StreamWriter("wezly.csv"))
             {
                 writer.WriteLine("zegar;" + Zegar);
-                writer.WriteLine("wezel;noActive;services");
+                writer.WriteLine("wezel;noActive;WorkLoad;services");
                 
                 foreach (Wezel wez in Wezly)
                 {
@@ -398,8 +399,9 @@ namespace SymulatorRownowazenia
                     foreach (int usg in wez.ObslugiwaneUslugi)
                     {
                         uslugi += usg + ",";
-                    }                    
-                    writer.WriteLine(wez.IDWezla + ";" + wez.CzasNieaktywnosci + ";" + uslugi + ";");
+                    }
+                    
+                    writer.WriteLine(wez.IDWezla + ";" + wez.CzasNieaktywnosci + ";" + wez.WykonaneKwantyCzasu + ";" + uslugi + ";");
 
                 }
 

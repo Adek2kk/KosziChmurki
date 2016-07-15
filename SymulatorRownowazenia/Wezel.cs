@@ -27,7 +27,8 @@ namespace SymulatorRownowazenia
         //Na razie nie jestem do końca pewny. :) Wedle obecnej implementacji, węzeł będzie starał się rozbić dostępne kwanty procesora na dana liczbę zadań.
         //PotencjalRownobieznegoPrzetwarzania musi być mniejszy lub równy MocObliczeniowa.
         public int PotencjalRownobieznegoPrzetwarzania { get; set; }
-
+        //Wykonane kwanty czasu procesora (dodawana wartość po zakończeniu zadania)
+        public int WykonaneKwantyCzasu = 0;
         //Funkcja przypisuje kwant czasu procesora danemu zadaniu, po czym zwraca 'true' jeżeli zadanie zostało zakończone, 'false' w przeciwnym razie
         public bool NadajKwant(Podzadanie zadanieDocelowe)
         {
@@ -54,6 +55,7 @@ namespace SymulatorRownowazenia
                     if (zakonczone)
                     {
                         //Wyrzucamy podzadanie z węzła
+                        WykonaneKwantyCzasu += zadanieWykonywane.WymaganyCzasPrzetwarzania;
                         PrzypisaneZadania.RemoveAt(j);
                         makszadid = Math.Min(PrzypisaneZadania.Count(), PotencjalRownobieznegoPrzetwarzania) - 1;
                     }
