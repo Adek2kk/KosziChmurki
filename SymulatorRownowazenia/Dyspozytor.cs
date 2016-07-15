@@ -24,7 +24,7 @@ namespace SymulatorRownowazenia
         //Na razie nieobsługiwane. Zadania przydzielane są modyfikacją JSFa - tj. na podstawie ilorazu zadań na danym węźle i mocy obliczeniowej danego węzła.
         public string SposobPrzydzialuZadan;
 
-
+        public int IloscUslug = 0;
 
 
 
@@ -55,6 +55,7 @@ namespace SymulatorRownowazenia
                     //Pobieramy ilość usług w każdej grupie
                     Int32.TryParse(line.Split(',')[2], out itmp2);
                     iloscuslug = itmp * itmp2;
+                    IloscUslug = iloscuslug;
                     Console.WriteLine(line);
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -265,7 +266,8 @@ namespace SymulatorRownowazenia
 
             //DEBUG - wypisuje węzły
             foreach (Wezel aktwez in Wezly)
-            { Console.Write(aktwez.IDWezla.ToString() + ", moc obliczeniowa: " + aktwez.MocObliczeniowa.ToString() + ", równobieżność: " + aktwez.PotencjalRownobieznegoPrzetwarzania.ToString() + ", usługi: ");
+            {
+                Console.Write(aktwez.IDWezla.ToString() + ", moc obliczeniowa: " + aktwez.MocObliczeniowa.ToString() + ", równobieżność: " + aktwez.PotencjalRownobieznegoPrzetwarzania.ToString() + ", usługi: ");
 
                 foreach (int usluga in aktwez.ObslugiwaneUslugi)
                 { Console.Write(usluga.ToString() + " "); }
@@ -276,7 +278,7 @@ namespace SymulatorRownowazenia
             Console.WriteLine("Aby rozpocząć przetwarzanie wciśnij klawisz Enter.");
             Console.ReadLine();
 
-            Console.WriteLine("Trwa przetwarzanie.");    
+            Console.WriteLine("Trwa przetwarzanie.");
 
             while (ZadaniaDoWykonania.Count > 0 || ZadaniaPrzetwarzane.Count > 0)
             {
@@ -310,7 +312,7 @@ namespace SymulatorRownowazenia
                         wykorzystanewezly.Add(idwezla);
 
                         Wezel WybranyWezel = Wezly.Where(e => e.IDWezla == idwezla).FirstOrDefault();
-                        WybranyWezel.PrzypisaneZadania.Add(exec);                        
+                        WybranyWezel.PrzypisaneZadania.Add(exec);
                     }
 
                     ZadaniaPrzetwarzane.Add(nadchodzace);
@@ -319,20 +321,20 @@ namespace SymulatorRownowazenia
                 //Każdy węzeł wykonuje swoje przetwarzanie
                 foreach (Wezel wezelek in Wezly)
                 {
-                  if (wezelek.PrzypisaneZadania.Count() == 0) { wezelek.CzasNieaktywnosci++; }
-                  else { wezelek.WykonajKrok(); }
+                    if (wezelek.PrzypisaneZadania.Count() == 0) { wezelek.CzasNieaktywnosci++; }
+                    else { wezelek.WykonajKrok(); }
                 }
 
                 //Sprawdzamy czy zakończyliśmy któreś zadanie
                 foreach (Zadanie zadanko in ZadaniaPrzetwarzane.Reverse<Zadanie>())
                 {
                     if (zadanko.czyukonczone())
-                    {   
+                    {
                         ZadaniaPrzetwarzane.Remove(zadanko);
                         ZadaniaZakonczone.Add(zadanko);
                     }
                 }
-                
+
 
                 Zegar++;
             }
@@ -354,12 +356,12 @@ namespace SymulatorRownowazenia
 
             }
 
-            int max, min , sum, n;
+            int max, min, sum, n;
             string ocz;
 
-            using (var writer = new StreamWriter("zadaniaOczekiwanie.csv"))
+            using (var writer = new StreamWriter("tasksOutput.csv"))
             {
-                writer.WriteLine("zadanie;max;min;avg;rest;");
+                writer.WriteLine("task;max;min;avg;kworum;");
                 foreach (Zadanie ukonczone in ZadaniaZakonczone)
                 {
                     max = -1;
@@ -381,18 +383,17 @@ namespace SymulatorRownowazenia
                         ocz += pukonczone.CzasOczekiwania + ";";
                     }
 
-                    writer.WriteLine(ukonczone.IDZadania.ToString() + "; " + max + "; " + min + "; " + sum/n + "; " + ocz);
-                    
+                    writer.WriteLine(ukonczone.IDZadania.ToString() + "; " + max + "; " + min + "; " + sum / n + "; " + ocz);
+
                 }
-               
+
             }
             string uslugi;
-            int wykonaneJednostki;
-            using (var writer = new StreamWriter("wezly.csv"))
+            using (var writer = new StreamWriter("nodesOutput.csv"))
             {
-                writer.WriteLine("zegar;" + Zegar);
-                writer.WriteLine("wezel;noActive;WorkLoad;services");
-                
+                writer.WriteLine("logicClock;" + Zegar);
+                writer.WriteLine("node;noActive;workLoad;services");
+
                 foreach (Wezel wez in Wezly)
                 {
                     uslugi = "";
@@ -400,16 +401,32 @@ namespace SymulatorRownowazenia
                     {
                         uslugi += usg + ",";
                     }
-                    
+
                     writer.WriteLine(wez.IDWezla + ";" + wez.CzasNieaktywnosci + ";" + wez.WykonaneKwantyCzasu + ";" + uslugi + ";");
 
                 }
 
             }
 
+            using (var writer = new StreamWriter("serviceOutput.csv"))
+            {
+                int[,] serviceTable = new int[IloscUslug, 2];
+                Array.Clear(serviceTable, 0, serviceTable.Length);
+                writer.WriteLine("service;workToDo;count;");
+                foreach (Zadanie ukonczone in ZadaniaZakonczone)
+                {
+                    foreach (Podzadanie pukonczone in ukonczone.Podzadania)
+                    {
+                        serviceTable[pukonczone.IDuslugi, 0] += pukonczone.WymaganyCzasPrzetwarzania;
+                        serviceTable[pukonczone.IDuslugi, 1]++;
+                    }
+                }
+                for (int i = 0; i < IloscUslug; i++)
+                {
+                    writer.WriteLine(i +";" + serviceTable[i, 0] + ";" + serviceTable[i, 1] + ";");
+                }
+            }
 
         }
-
-
     }
 }
