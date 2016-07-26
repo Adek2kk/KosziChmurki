@@ -33,6 +33,8 @@ namespace SymulatorRownowazenia
         public int SumaCzasowPrzypisanychZadan = 0;
         //Do obliczania parametrów - spisywane są tu długości kolejnych zadań
         public List<double> DlugosciPrzypisanychZadan { get; set; }
+        //Do obliczania parametrów - spisywane są tu fragmenty do których odnoszą się kolejne zadania
+        public List<int> FragmentyPrzypisanychZadan { get; set; }
 
         //Funkcja przypisuje kwant czasu procesora danemu zadaniu, po czym zwraca 'true' jeżeli zadanie zostało zakończone, 'false' w przeciwnym razie
         public bool NadajKwant(Podzadanie zadanieDocelowe)
