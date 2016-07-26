@@ -26,8 +26,19 @@ namespace SymulatorRownowazenia
 
         public int IloscUslug = 0;
 
-
-
+        //Funkcja obliczająca odchylenie standardowe z listy doubli
+        private double getStandardDeviation(List<double> doubleList)
+        {
+            double average = doubleList.Average();
+            double sumOfDerivation = 0;
+            foreach (double value in doubleList)
+            {
+                sumOfDerivation += (value) * (value);
+            }
+            //double sumOfDerivationAverage = sumOfDerivation / (doubleList.Count - 1);
+            double sumOfDerivationAverage = sumOfDerivation / (doubleList.Count);
+            return Math.Sqrt(sumOfDerivationAverage - (average * average));
+        }
 
 
         public void Init()
@@ -190,6 +201,7 @@ namespace SymulatorRownowazenia
                         nowywezel.CzasNieaktywnosci = 0;
                         nowywezel.PrzypisaneZadania = new List<Podzadanie>();
                         nowywezel.ObslugiwaneUslugi = new List<int>();
+                        nowywezel.DlugosciPrzypisanychZadan = new List<double>();
 
                         int tmp;
                         int ilosczadan;
@@ -313,6 +325,8 @@ namespace SymulatorRownowazenia
 
                         Wezel WybranyWezel = Wezly.Where(e => e.IDWezla == idwezla).FirstOrDefault();
                         WybranyWezel.PrzypisaneZadania.Add(exec);
+                        WybranyWezel.SumaCzasowPrzypisanychZadan = WybranyWezel.SumaCzasowPrzypisanychZadan + exec.WymaganyCzasPrzetwarzania;
+                        WybranyWezel.DlugosciPrzypisanychZadan.Add(Convert.ToDouble(exec.WymaganyCzasPrzetwarzania));
                     }
 
                     ZadaniaPrzetwarzane.Add(nadchodzace);
@@ -355,6 +369,27 @@ namespace SymulatorRownowazenia
                 }
 
             }
+
+            //DEBUG - oblicza i wypisuje odchylenie standardowe sum czasów przetwarzania
+            List<double> listasumczasowprzetwarzania = new List<double>();
+            foreach (Wezel w in Wezly)
+            {
+                listasumczasowprzetwarzania.Add(System.Convert.ToDouble(w.SumaCzasowPrzypisanychZadan));
+                Console.WriteLine("Dla wezla " + w.IDWezla + " suma czasów przypisanych zadań wynosi: " + w.SumaCzasowPrzypisanychZadan);
+            }
+            double odchsum = getStandardDeviation(listasumczasowprzetwarzania);
+            Console.WriteLine("Odchylenie standardowe sum wynosi: " + odchsum);
+
+            //DEBUG - oblicza i wypisuje sumę odchyleń czasów przetwarzania na poszczególnych węzłach
+            double sumaodchylen = 0;
+            foreach (Wezel w in Wezly)
+            {
+                sumaodchylen = sumaodchylen + getStandardDeviation(w.DlugosciPrzypisanychZadan);
+            }
+            Console.WriteLine("Suma odchyleń standardowych wynosi: " + sumaodchylen);
+
+            //DEBUG - oblicza i wypisuje iloraz odchylenia standardowego sum i sumy odchyleń standardowych
+            Console.WriteLine("Ich iloraz wynosi: " + odchsum / sumaodchylen);
 
             int max, min, sum, n;
             string ocz;

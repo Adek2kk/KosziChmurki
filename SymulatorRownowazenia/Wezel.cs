@@ -29,6 +29,11 @@ namespace SymulatorRownowazenia
         public int PotencjalRownobieznegoPrzetwarzania { get; set; }
         //Wykonane kwanty czasu procesora (dodawana wartość po zakończeniu zadania)
         public int WykonaneKwantyCzasu = 0;
+        //Do obliczania parametrów - sumowana jest tu długość zadań
+        public int SumaCzasowPrzypisanychZadan = 0;
+        //Do obliczania parametrów - spisywane są tu długości kolejnych zadań
+        public List<double> DlugosciPrzypisanychZadan { get; set; }
+
         //Funkcja przypisuje kwant czasu procesora danemu zadaniu, po czym zwraca 'true' jeżeli zadanie zostało zakończone, 'false' w przeciwnym razie
         public bool NadajKwant(Podzadanie zadanieDocelowe)
         {
