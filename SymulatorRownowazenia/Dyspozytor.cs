@@ -394,43 +394,48 @@ namespace SymulatorRownowazenia
             Console.WriteLine("Ich iloraz wynosi: " + odchsum / sumaodchylen);
 
             //DEBUG - oblicza i wyświetla drugi z parametrów dla każdego węzła
-            foreach (Wezel w in Wezly)
+            using (var writer = new StreamWriter("paramOutput.csv"))
             {
-                List<int> obsluzone = new List<int>();
-                List<List<double>> listydlugosci = new List<List<double>>();
-                //List<double> sumarycznedlugosci = new List<double>();
-                double wartosc = 0;
-                int fragmentzadania;
-                double sumaodchylenwezla = 0;
-                wartosc = getStandardDeviation(w.DlugosciPrzypisanychZadan);
-
-                //Trochę naokrągło, ale dla każdego fragmentu albo dopisuję wielkość dotyczącego go zadania do odpowiedniej listy, albo taką listę tworzę
-                //Proszę zwrócić uwagę, że identyfikator fragmentu zadania x i długość zadania x mają ten sam indeks 
-                for (int i = 0; i < w.FragmentyPrzypisanychZadan.Count(); i++)
+                writer.WriteLine("global;" + odchsum / sumaodchylen);
+                writer.WriteLine("node;local;");
+                foreach (Wezel w in Wezly)
                 {
-                    fragmentzadania = w.FragmentyPrzypisanychZadan.ElementAt(i);
-                    if (obsluzone.Contains(fragmentzadania))
-                    {
-                        int numerlisty = obsluzone.IndexOf(fragmentzadania);
-                        listydlugosci.ElementAt(numerlisty).Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
-                    }
-                    else
-                    {
-                        List<double> nowalista = new List<double>();
-                        nowalista.Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
-                        listydlugosci.Add(nowalista);
-                        obsluzone.Add(fragmentzadania);
-                    }
-                }
+                    List<int> obsluzone = new List<int>();
+                    List<List<double>> listydlugosci = new List<List<double>>();
+                    //List<double> sumarycznedlugosci = new List<double>();
+                    double wartosc = 0;
+                    int fragmentzadania;
+                    double sumaodchylenwezla = 0;
+                    wartosc = getStandardDeviation(w.DlugosciPrzypisanychZadan);
 
-                //Dla każdego fragmentu znajdującego się na danym węźle wyliczam stddev i dodaję go do sumatora
-                foreach (List<double> listeczka in listydlugosci)
-                {
-                    sumaodchylenwezla = sumaodchylenwezla + getStandardDeviation(listeczka);
+                    //Trochę naokrągło, ale dla każdego fragmentu albo dopisuję wielkość dotyczącego go zadania do odpowiedniej listy, albo taką listę tworzę
+                    //Proszę zwrócić uwagę, że identyfikator fragmentu zadania x i długość zadania x mają ten sam indeks 
+                    for (int i = 0; i < w.FragmentyPrzypisanychZadan.Count(); i++)
+                    {
+                        fragmentzadania = w.FragmentyPrzypisanychZadan.ElementAt(i);
+                        if (obsluzone.Contains(fragmentzadania))
+                        {
+                            int numerlisty = obsluzone.IndexOf(fragmentzadania);
+                            listydlugosci.ElementAt(numerlisty).Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
+                        }
+                        else
+                        {
+                            List<double> nowalista = new List<double>();
+                            nowalista.Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
+                            listydlugosci.Add(nowalista);
+                            obsluzone.Add(fragmentzadania);
+                        }
+                    }
+
+                    //Dla każdego fragmentu znajdującego się na danym węźle wyliczam stddev i dodaję go do sumatora
+                    foreach (List<double> listeczka in listydlugosci)
+                    {
+                        sumaodchylenwezla = sumaodchylenwezla + getStandardDeviation(listeczka);
+                    }
+                    Console.WriteLine("Dla wezla " + w.IDWezla + " wartość drugiego parametru wynosi: " + sumaodchylenwezla / obsluzone.Count());
+                    writer.WriteLine(w.IDWezla + ";" + sumaodchylenwezla / obsluzone.Count());
                 }
-                Console.WriteLine("Dla wezla " + w.IDWezla + " wartość drugiego parametru wynosi: " + sumaodchylenwezla / obsluzone.Count());
             }
-            
 
 
             int max, min, sum, n;
