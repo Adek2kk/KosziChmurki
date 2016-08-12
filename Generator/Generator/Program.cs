@@ -31,11 +31,11 @@ namespace Generator
             string line = Console.ReadLine();
             Int32.TryParse(line, out czas);
 
-            Console.WriteLine("Podaj ilość grup usług");
+            Console.WriteLine("Podaj liczbę grup usług");
             line = Console.ReadLine();
             Int32.TryParse(line, out liczba_grup);
 
-            Console.WriteLine("Podaj ilość usług w grupie");
+            Console.WriteLine("Podaj liczbę usług w grupie");
             line = Console.ReadLine();
             Int32.TryParse(line, out liczb_podlist_w_grupie);
 

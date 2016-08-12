@@ -17,6 +17,11 @@ namespace SymulatorRownowazenia
         public List<Podzadanie> ZadaniaDoWykonania;
         //Lista węzłów
         public List<Wezel> Wezly;
+
+
+        //Tablica list potrzebna do parametru globalnego
+        public List<double>[] ZadaniaDoUslugi;
+
         //Główny zegar logiczny
         public long Zegar;
         //Wymagana liczność kworum. Musi być mniejsza od powtórzeń usługi na różnych węzłach
@@ -29,7 +34,12 @@ namespace SymulatorRownowazenia
         //Funkcja obliczająca odchylenie standardowe z listy doubli
         private double getStandardDeviation(List<double> doubleList)
         {
-            double average = doubleList.Average();
+            double average = 0;
+            try
+            {
+                average = doubleList.Average();
+            }
+            catch { int a=1; }
             double sumOfDerivation = 0;
             foreach (double value in doubleList)
             {
@@ -67,6 +77,12 @@ namespace SymulatorRownowazenia
                     Int32.TryParse(line.Split(',')[2], out itmp2);
                     iloscuslug = itmp * itmp2;
                     IloscUslug = iloscuslug;
+
+                    //Stworzenie tablicy list potrzebnej do obliczenia globalnego paramteru
+                    ZadaniaDoUslugi = new List<double>[IloscUslug];
+                    for(int i=0;i<IloscUslug;i++)
+                        ZadaniaDoUslugi[i] = new List<double>();
+
                     Console.WriteLine(line);
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -82,6 +98,8 @@ namespace SymulatorRownowazenia
                         nowezadanie.WymaganyCzasPrzetwarzania = tmp;
                         Int32.TryParse(line.Split(',')[3], out tmp);
                         nowezadanie.IDuslugi = tmp;
+
+                        ZadaniaDoUslugi[nowezadanie.IDuslugi].Add(Convert.ToDouble(nowezadanie.WymaganyCzasPrzetwarzania));
 
                         ZadaniaDoWykonania.Add(nowezadanie);
                     }
@@ -393,10 +411,21 @@ namespace SymulatorRownowazenia
             //DEBUG - oblicza i wypisuje iloraz odchylenia standardowego sum i sumy odchyleń standardowych
             Console.WriteLine("Ich iloraz wynosi: " + odchsum / sumaodchylen);
 
+            //Adkowe obliczenie globala
+            double Adekodchsum = 0, Adeksumaodchylen = 0;
+            List<double> SumyUslug = new List<double>();
+
+            for (int i = 0; i < IloscUslug; i++)
+            {
+                SumyUslug.Add(ZadaniaDoUslugi[i].Sum());
+                Adeksumaodchylen += getStandardDeviation(ZadaniaDoUslugi[i]);
+            }
+            Adekodchsum = getStandardDeviation(SumyUslug);
+
             //DEBUG - oblicza i wyświetla drugi z parametrów dla każdego węzła
             using (var writer = new StreamWriter("paramOutput.csv"))
             {
-                writer.WriteLine("global;" + odchsum / sumaodchylen);
+                writer.WriteLine("global;" + Adekodchsum / Adeksumaodchylen + ";" + Adekodchsum + ";" + Adeksumaodchylen);
                 writer.WriteLine("node;local;");
                 foreach (Wezel w in Wezly)
                 {
