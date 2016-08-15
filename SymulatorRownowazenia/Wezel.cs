@@ -13,6 +13,8 @@ namespace SymulatorRownowazenia
     {
         //Identyfikator węzła
         public int IDWezla { get; set; }
+
+        public List<Podzadanie> HistoriaZadania { get; set; }
         //Lista podzadań aktualnie wykonujących się na danym węźle
         public List<Podzadanie> PrzypisaneZadania { get; set; }
         //Lista identyfikatorów usłyug obsługiwanych na danym węźle
@@ -35,6 +37,8 @@ namespace SymulatorRownowazenia
         public List<double> DlugosciPrzypisanychZadan { get; set; }
         //Do obliczania parametrów - spisywane są tu fragmenty do których odnoszą się kolejne zadania
         public List<int> FragmentyPrzypisanychZadan { get; set; }
+
+
 
         //Funkcja przypisuje kwant czasu procesora danemu zadaniu, po czym zwraca 'true' jeżeli zadanie zostało zakończone, 'false' w przeciwnym razie
         public bool NadajKwant(Podzadanie zadanieDocelowe)

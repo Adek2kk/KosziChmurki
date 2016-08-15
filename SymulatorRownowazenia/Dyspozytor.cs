@@ -95,7 +95,9 @@ namespace SymulatorRownowazenia
                         Int32.TryParse(line.Split(',')[1], out tmp);
                         nowezadanie.ChwilaNadejscia = tmp;
                         Int32.TryParse(line.Split(',')[2], out tmp);
-                        nowezadanie.WymaganyCzasPrzetwarzania = tmp;
+                        //nowezadanie.WymaganyCzasPrzetwarzania = tmp;
+
+                        nowezadanie.WymaganyCzasPrzetwarzania = 5;
                         Int32.TryParse(line.Split(',')[3], out tmp);
                         nowezadanie.IDuslugi = tmp;
 
@@ -218,6 +220,7 @@ namespace SymulatorRownowazenia
                         Wezel nowywezel = new Wezel();
                         nowywezel.CzasNieaktywnosci = 0;
                         nowywezel.PrzypisaneZadania = new List<Podzadanie>();
+                        nowywezel.HistoriaZadania = new List<Podzadanie>();
                         nowywezel.ObslugiwaneUslugi = new List<int>();
                         nowywezel.DlugosciPrzypisanychZadan = new List<double>();
                         nowywezel.FragmentyPrzypisanychZadan = new List<int>();
@@ -337,6 +340,15 @@ namespace SymulatorRownowazenia
                         exec.WymaganyCzasPrzetwarzania = nadeszlo.WymaganyCzasPrzetwarzania;
                         exec.Zakonczone = false;
 
+                        Podzadanie exec2 = new Podzadanie();
+                        exec2.ChwilaNadejscia = (int)Zegar;
+                        exec2.CzasOczekiwania = 0;
+                        exec2.CzasPrzetwarzania = 0;
+                        exec2.IDuslugi = nadeszlo.IDuslugi;
+                        exec2.IDZadania = nadeszlo.IDZadania;
+                        exec2.WymaganyCzasPrzetwarzania = nadeszlo.WymaganyCzasPrzetwarzania;
+                        exec2.Zakonczone = false;
+
                         nadchodzace.Podzadania.Add(exec);
 
                         int idwezla = ZnajdzWezel(exec.IDuslugi, wykorzystanewezly);
@@ -344,6 +356,7 @@ namespace SymulatorRownowazenia
 
                         Wezel WybranyWezel = Wezly.Where(e => e.IDWezla == idwezla).FirstOrDefault();
                         WybranyWezel.PrzypisaneZadania.Add(exec);
+                        WybranyWezel.HistoriaZadania.Add(exec2);
                         WybranyWezel.SumaCzasowPrzypisanychZadan = WybranyWezel.SumaCzasowPrzypisanychZadan + exec.WymaganyCzasPrzetwarzania;
                         WybranyWezel.DlugosciPrzypisanychZadan.Add(Convert.ToDouble(exec.WymaganyCzasPrzetwarzania));
                         WybranyWezel.FragmentyPrzypisanychZadan.Add(exec.IDuslugi);
@@ -436,33 +449,59 @@ namespace SymulatorRownowazenia
                     int fragmentzadania;
                     double sumaodchylenwezla = 0;
                     wartosc = getStandardDeviation(w.DlugosciPrzypisanychZadan);
+                    List<double>[] AdekDoUslugi;
+                    AdekDoUslugi = new List<double>[IloscUslug];
+                    for (int i = 0; i < IloscUslug; i++)
+                        AdekDoUslugi[i] = new List<double>();
+                    List<double> TmpLicznik = new List<double>();
 
                     //Trochę naokrągło, ale dla każdego fragmentu albo dopisuję wielkość dotyczącego go zadania do odpowiedniej listy, albo taką listę tworzę
                     //Proszę zwrócić uwagę, że identyfikator fragmentu zadania x i długość zadania x mają ten sam indeks 
-                    for (int i = 0; i < w.FragmentyPrzypisanychZadan.Count(); i++)
-                    {
-                        fragmentzadania = w.FragmentyPrzypisanychZadan.ElementAt(i);
-                        if (obsluzone.Contains(fragmentzadania))
+                   /* for (int i = 0; i < w.PrzypisaneZadania.Count(); i++)
+                    {*/
+                        foreach(Podzadanie zadanko in w.HistoriaZadania)
                         {
-                            int numerlisty = obsluzone.IndexOf(fragmentzadania);
-                            listydlugosci.ElementAt(numerlisty).Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
+                            AdekDoUslugi[zadanko.IDuslugi].Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
+                            TmpLicznik.Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
                         }
-                        else
+                    //wartosc = getStandardDeviation(TmpLicznik);
+                   /*
+                   fragmentzadania = w.FragmentyPrzypisanychZadan.ElementAt(i);
+                   if (obsluzone.Contains(fragmentzadania))
+                   {
+                       int numerlisty = obsluzone.IndexOf(fragmentzadania);
+                       listydlugosci.ElementAt(numerlisty).Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
+                   }
+                   else
+                   {
+                       List<double> nowalista = new List<double>();
+                       nowalista.Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
+                       listydlugosci.Add(nowalista);
+                       obsluzone.Add(fragmentzadania);
+                   }
+                   */
+                   //AdekDoUslugi[w.PrzypisaneZadania.ElementAt(i).IDuslugi].Add(Convert.ToDouble(w.PrzypisaneZadania.ElementAt(i).WymaganyCzasPrzetwarzania));
+
+                   //}
+                   List <double> AdekSumyUslug = new List<double>();
+                    double adektmpsuma = 0;
+                    double Adekodchsum2 = 0;
+                    for (int i =0;i< IloscUslug;i++)
+                    {
+                        if (AdekDoUslugi[i].Count() != 0)
                         {
-                            List<double> nowalista = new List<double>();
-                            nowalista.Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
-                            listydlugosci.Add(nowalista);
-                            obsluzone.Add(fragmentzadania);
+                            adektmpsuma += getStandardDeviation(AdekDoUslugi[i]);
+                            AdekSumyUslug.Add(AdekDoUslugi[i].Sum());
                         }
                     }
-
+                    Adekodchsum2 = getStandardDeviation(AdekSumyUslug);
                     //Dla każdego fragmentu znajdującego się na danym węźle wyliczam stddev i dodaję go do sumatora
                     foreach (List<double> listeczka in listydlugosci)
                     {
                         sumaodchylenwezla = sumaodchylenwezla + getStandardDeviation(listeczka);
                     }
-                    Console.WriteLine("Dla wezla " + w.IDWezla + " wartość drugiego parametru wynosi: " + sumaodchylenwezla / obsluzone.Count());
-                    writer.WriteLine(w.IDWezla + ";" + sumaodchylenwezla / obsluzone.Count());
+                    Console.WriteLine("Dla wezla " + w.IDWezla + " wartość drugiego parametru wynosi: " + wartosc / adektmpsuma);
+                    writer.WriteLine(w.IDWezla + ";" + wartosc / adektmpsuma);
                 }
             }
 
