@@ -95,9 +95,7 @@ namespace SymulatorRownowazenia
                         Int32.TryParse(line.Split(',')[1], out tmp);
                         nowezadanie.ChwilaNadejscia = tmp;
                         Int32.TryParse(line.Split(',')[2], out tmp);
-                        //nowezadanie.WymaganyCzasPrzetwarzania = tmp;
-
-                        nowezadanie.WymaganyCzasPrzetwarzania = 5;
+                        nowezadanie.WymaganyCzasPrzetwarzania = tmp;
                         Int32.TryParse(line.Split(',')[3], out tmp);
                         nowezadanie.IDuslugi = tmp;
 
@@ -462,7 +460,7 @@ namespace SymulatorRownowazenia
                         foreach(Podzadanie zadanko in w.HistoriaZadania)
                         {
                             AdekDoUslugi[zadanko.IDuslugi].Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
-                            TmpLicznik.Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
+                           // TmpLicznik.Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
                         }
                     //wartosc = getStandardDeviation(TmpLicznik);
                    /*
@@ -491,10 +489,10 @@ namespace SymulatorRownowazenia
                         if (AdekDoUslugi[i].Count() != 0)
                         {
                             adektmpsuma += getStandardDeviation(AdekDoUslugi[i]);
-                            AdekSumyUslug.Add(AdekDoUslugi[i].Sum());
+                            //AdekSumyUslug.Add(AdekDoUslugi[i].Sum());
                         }
                     }
-                    Adekodchsum2 = getStandardDeviation(AdekSumyUslug);
+                    //Adekodchsum2 = getStandardDeviation(AdekSumyUslug);
                     //Dla każdego fragmentu znajdującego się na danym węźle wyliczam stddev i dodaję go do sumatora
                     foreach (List<double> listeczka in listydlugosci)
                     {
