@@ -401,105 +401,43 @@ namespace SymulatorRownowazenia
 
             }
 
-            //DEBUG - oblicza i wypisuje odchylenie standardowe sum czasów przetwarzania
-            List<double> listasumczasowprzetwarzania = new List<double>();
-            foreach (Wezel w in Wezly)
-            {
-                listasumczasowprzetwarzania.Add(System.Convert.ToDouble(w.SumaCzasowPrzypisanychZadan));
-                Console.WriteLine("Dla wezla " + w.IDWezla + " suma czasów przypisanych zadań wynosi: " + w.SumaCzasowPrzypisanychZadan);
-            }
-            double odchsum = getStandardDeviation(listasumczasowprzetwarzania);
-            Console.WriteLine("Odchylenie standardowe sum wynosi: " + odchsum);
-
-            //DEBUG - oblicza i wypisuje sumę odchyleń czasów przetwarzania na poszczególnych węzłach
-            double sumaodchylen = 0;
-            foreach (Wezel w in Wezly)
-            {
-                sumaodchylen = sumaodchylen + getStandardDeviation(w.DlugosciPrzypisanychZadan);
-            }
-            Console.WriteLine("Suma odchyleń standardowych wynosi: " + sumaodchylen);
-
-            //DEBUG - oblicza i wypisuje iloraz odchylenia standardowego sum i sumy odchyleń standardowych
-            Console.WriteLine("Ich iloraz wynosi: " + odchsum / sumaodchylen);
-
-            //Adkowe obliczenie globala
-            double Adekodchsum = 0, Adeksumaodchylen = 0;
+            //Obliczenie parametru globalnego
+            double odchsum = 0, sumaodchylen = 0;
             List<double> SumyUslug = new List<double>();
 
             for (int i = 0; i < IloscUslug; i++)
             {
                 SumyUslug.Add(ZadaniaDoUslugi[i].Sum());
-                Adeksumaodchylen += getStandardDeviation(ZadaniaDoUslugi[i]);
+                sumaodchylen += getStandardDeviation(ZadaniaDoUslugi[i]);
             }
-            Adekodchsum = getStandardDeviation(SumyUslug);
+            odchsum = getStandardDeviation(SumyUslug);
 
             //DEBUG - oblicza i wyświetla drugi z parametrów dla każdego węzła
             using (var writer = new StreamWriter("paramOutput.csv"))
             {
-                writer.WriteLine("global;" + Adekodchsum / Adeksumaodchylen + ";" + Adekodchsum + ";" + Adeksumaodchylen);
+                writer.WriteLine("global;" + odchsum / sumaodchylen);
                 writer.WriteLine("node;local;");
                 foreach (Wezel w in Wezly)
                 {
-                    List<int> obsluzone = new List<int>();
-                    List<List<double>> listydlugosci = new List<List<double>>();
-                    //List<double> sumarycznedlugosci = new List<double>();
                     double wartosc = 0;
-                    int fragmentzadania;
-                    double sumaodchylenwezla = 0;
                     wartosc = getStandardDeviation(w.DlugosciPrzypisanychZadan);
-                    List<double>[] AdekDoUslugi;
-                    AdekDoUslugi = new List<double>[IloscUslug];
+                    List<double>[] LocalZadaniaDoUslugi;
+                    LocalZadaniaDoUslugi = new List<double>[IloscUslug];
                     for (int i = 0; i < IloscUslug; i++)
-                        AdekDoUslugi[i] = new List<double>();
-                    List<double> TmpLicznik = new List<double>();
-
-                    //Trochę naokrągło, ale dla każdego fragmentu albo dopisuję wielkość dotyczącego go zadania do odpowiedniej listy, albo taką listę tworzę
-                    //Proszę zwrócić uwagę, że identyfikator fragmentu zadania x i długość zadania x mają ten sam indeks 
-                   /* for (int i = 0; i < w.PrzypisaneZadania.Count(); i++)
-                    {*/
-                        foreach(Podzadanie zadanko in w.HistoriaZadania)
-                        {
-                            AdekDoUslugi[zadanko.IDuslugi].Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
-                           // TmpLicznik.Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
-                        }
-                    //wartosc = getStandardDeviation(TmpLicznik);
-                   /*
-                   fragmentzadania = w.FragmentyPrzypisanychZadan.ElementAt(i);
-                   if (obsluzone.Contains(fragmentzadania))
-                   {
-                       int numerlisty = obsluzone.IndexOf(fragmentzadania);
-                       listydlugosci.ElementAt(numerlisty).Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
-                   }
-                   else
-                   {
-                       List<double> nowalista = new List<double>();
-                       nowalista.Add(w.DlugosciPrzypisanychZadan.ElementAt(i));
-                       listydlugosci.Add(nowalista);
-                       obsluzone.Add(fragmentzadania);
-                   }
-                   */
-                   //AdekDoUslugi[w.PrzypisaneZadania.ElementAt(i).IDuslugi].Add(Convert.ToDouble(w.PrzypisaneZadania.ElementAt(i).WymaganyCzasPrzetwarzania));
-
-                   //}
-                   List <double> AdekSumyUslug = new List<double>();
-                    double adektmpsuma = 0;
-                    double Adekodchsum2 = 0;
+                        LocalZadaniaDoUslugi[i] = new List<double>();
+                   
+                    foreach(Podzadanie zadanko in w.HistoriaZadania)
+                        LocalZadaniaDoUslugi[zadanko.IDuslugi].Add(Convert.ToDouble(zadanko.WymaganyCzasPrzetwarzania));
+                    
+                    double localsuma = 0;
                     for (int i =0;i< IloscUslug;i++)
                     {
-                        if (AdekDoUslugi[i].Count() != 0)
-                        {
-                            adektmpsuma += getStandardDeviation(AdekDoUslugi[i]);
-                            //AdekSumyUslug.Add(AdekDoUslugi[i].Sum());
-                        }
+                        if (LocalZadaniaDoUslugi[i].Count() != 0)
+                            localsuma += getStandardDeviation(LocalZadaniaDoUslugi[i]);
                     }
-                    //Adekodchsum2 = getStandardDeviation(AdekSumyUslug);
-                    //Dla każdego fragmentu znajdującego się na danym węźle wyliczam stddev i dodaję go do sumatora
-                    foreach (List<double> listeczka in listydlugosci)
-                    {
-                        sumaodchylenwezla = sumaodchylenwezla + getStandardDeviation(listeczka);
-                    }
-                    Console.WriteLine("Dla wezla " + w.IDWezla + " wartość drugiego parametru wynosi: " + wartosc / adektmpsuma);
-                    writer.WriteLine(w.IDWezla + ";" + wartosc / adektmpsuma);
+                  
+                    Console.WriteLine("Dla wezla " + w.IDWezla + " wartość lokalnego parametru wynosi: " + wartosc / localsuma);
+                    writer.WriteLine(w.IDWezla + ";" + wartosc / localsuma);
                 }
             }
 
