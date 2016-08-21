@@ -13,7 +13,7 @@ namespace SymulatorRownowazenia
         public List<Zadanie> ZadaniaPrzetwarzane;
         //Zadania które zostały przetworzone
         public List<Zadanie> ZadaniaZakonczone;
-        //Mało intuicyjne, ale prawdziwe - to tutaj wczytywane są zadania z listy
+        //To tutaj wczytywane są zadania z listy
         public List<Podzadanie> ZadaniaDoWykonania;
         //Lista węzłów
         public List<Wezel> Wezly;
@@ -26,8 +26,7 @@ namespace SymulatorRownowazenia
         public long Zegar;
         //Wymagana liczność kworum. Musi być mniejsza od powtórzeń usługi na różnych węzłach
         public int LicznoscKworum;
-        //Na razie nieobsługiwane. Zadania przydzielane są modyfikacją JSFa - tj. na podstawie ilorazu zadań na danym węźle i mocy obliczeniowej danego węzła.
-        public string SposobPrzydzialuZadan;
+        
 
         public int IloscUslug = 0;
 
@@ -61,7 +60,6 @@ namespace SymulatorRownowazenia
             ZadaniaPrzetwarzane = new List<Zadanie>();
             ZadaniaZakonczone = new List<Zadanie>();
             Wezly = new List<Wezel>();
-            int idwezlaiter = 1;
 
             try
             {   using (StreamReader sr = new StreamReader("Zadania_gen.txt"))
@@ -86,7 +84,7 @@ namespace SymulatorRownowazenia
                     Console.WriteLine(line);
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.WriteLine(line);
+                        //Console.WriteLine(line);
                         Podzadanie nowezadanie = new Podzadanie();
 
                         int tmp;
@@ -103,74 +101,7 @@ namespace SymulatorRownowazenia
 
                         ZadaniaDoWykonania.Add(nowezadanie);
                     }
-
-
-                    //Tworzenie węzłów - ręczne;
-                    /* //Kworum
-                    Console.WriteLine("Podaj liczność kworum");
-                    stmp = Console.ReadLine();
-
-                    Int32.TryParse(stmp, out itmp);
-
-                    LicznoscKworum = itmp;
-                    //Tworzymy listę na której zaznaczać będziemy ilości wystąpień poszczególnych usług
-                    int[] wystapienia = new int[iloscuslug];
-                    for (int i = 0; i < iloscuslug; i++)
-                    {
-                        wystapienia[i] = 0;
-                    }
-                     * 
-                     * 
-                     * 
-                     * do
-                    {
-                        Wezel nowywezel = new Wezel();
-                        nowywezel.IDWezla = idwezlaiter;
-                        idwezlaiter++;
-                        nowywezel.CzasNieaktywnosci = 0;
-                        nowywezel.PrzypisaneZadania = new List<Podzadanie>();
-                        nowywezel.ObslugiwaneUslugi = new List<int>();
-
-                        Console.Write("Proszę podać listę usług ulokowanych na tym węźle w formie u1,u2,u3,u4...");
-                        Console.Write("Przypomnienie: Zadeklarowane jest " + (iloscuslug).ToString() + " usług. Podawaj więc numery od 0 do " + (iloscuslug-1).ToString());
-
-                        stmp = Console.ReadLine();
-
-                        foreach (string uslu in stmp.Split(','))
-                        {
-                            int numeruslugi;
-                            Int32.TryParse(uslu, out numeruslugi);
-
-                            wystapienia[numeruslugi]++;
-                            nowywezel.ObslugiwaneUslugi.Add(numeruslugi);
-                        }
-
-                        Console.Write("Proszę podać moc obliczeniową węzła, tj. ilość kwantów czasu procesora w jednym kwancie czasu");
-                        stmp = Console.ReadLine();
-                        Int32.TryParse(stmp, out itmp);
-                        nowywezel.MocObliczeniowa = itmp;
-
-                        Console.Write("Proszę podać potencjał równomiernego przetwarzania węzła, tj. maksymalną ilość zadań które mogą otrzymać na danym procesorze kwant czasu procesora w kwancie czasu");
-                        stmp = Console.ReadLine();
-                        Int32.TryParse(stmp, out itmp);
-                        nowywezel.PotencjalRownobieznegoPrzetwarzania = itmp;
-
-                        Wezly.Add(nowywezel);
-
-                        int min = wystapienia.Min();
-                        if (min < LicznoscKworum)
-                        {
-                            Console.Write("Liczność kworum jest wyższa od minimalnej ilości wystąpień jednej z usług. Przechodzenie to tworzenia kolejnego węzła...");
-                            stmp = Console.ReadLine();
-                        }
-
-                        else
-                        {
-                            Console.Write("Czy chcesz przejść do tworzenia kolejnego węzła? Odpowiedź 'N' spowoduje zakończenie tworzenia węzłów.");
-                            stmp = Console.ReadLine();
-                        }
-                    }
-                    while (!stmp.Equals("N"));*/
+                    
                 }
             }
             catch (Exception e)
@@ -214,7 +145,7 @@ namespace SymulatorRownowazenia
 
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.WriteLine(line);
+                        //Console.WriteLine(line);
                         Wezel nowywezel = new Wezel();
                         nowywezel.CzasNieaktywnosci = 0;
                         nowywezel.PrzypisaneZadania = new List<Podzadanie>();
@@ -293,11 +224,12 @@ namespace SymulatorRownowazenia
             ZadaniaDoWykonania = ZadaniaDoWykonania.OrderBy(e => e.ChwilaNadejscia).ToList();
 
             //DEBUG - wypisuje zadania do wykonania
-            foreach (Podzadanie zad in ZadaniaDoWykonania)
+            /*foreach (Podzadanie zad in ZadaniaDoWykonania)
             { Console.WriteLine(zad.IDZadania + "," + zad.ChwilaNadejscia + "," + zad.CzasPrzetwarzania + "," + zad.IDuslugi); }
+            */
 
             //DEBUG - wypisuje węzły
-            foreach (Wezel aktwez in Wezly)
+            /*foreach (Wezel aktwez in Wezly)
             {
                 Console.Write(aktwez.IDWezla.ToString() + ", moc obliczeniowa: " + aktwez.MocObliczeniowa.ToString() + ", równobieżność: " + aktwez.PotencjalRownobieznegoPrzetwarzania.ToString() + ", usługi: ");
 
@@ -305,7 +237,7 @@ namespace SymulatorRownowazenia
                 { Console.Write(usluga.ToString() + " "); }
 
                 Console.WriteLine();
-            }
+            }*/
 
             Console.WriteLine("Aby rozpocząć przetwarzanie wciśnij klawisz Enter.");
             Console.ReadLine();
@@ -385,12 +317,12 @@ namespace SymulatorRownowazenia
             }
 
             //DEBUG - komunikat o zakończeniu przetwarzania
-            Console.WriteLine("Congratulations, the winner is you");
+            Console.WriteLine("Zadanie zakończono.");
             Console.WriteLine("Wykonano " + ZadaniaZakonczone.Count().ToString() + " zadań, czyli " + (ZadaniaZakonczone.Count() * LicznoscKworum).ToString() + " podzadań.");
             Console.WriteLine("Podczas zakończenia zegar logiczny miał wartość " + Zegar.ToString());
 
-            //DEBUG - wypisuje statystyki zadań
-            foreach (Zadanie ukonczone in ZadaniaZakonczone)
+            //DEBUG - wypisuje statystyki poszczególnych zadań
+            /*foreach (Zadanie ukonczone in ZadaniaZakonczone)
             {
                 Console.WriteLine("Zadanie " + ukonczone.IDZadania.ToString());
 
@@ -399,7 +331,7 @@ namespace SymulatorRownowazenia
                     Console.WriteLine(pukonczone.ChwilaNadejscia.ToString() + " " + pukonczone.CzasOczekiwania.ToString());
                 }
 
-            }
+            }*/
 
             //Obliczenie parametru globalnego
             double odchsum = 0, sumaodchylen = 0;

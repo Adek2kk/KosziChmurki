@@ -37,9 +37,10 @@ namespace Node_generator
             }
             // below function calculates correlations between all the services
             generator.Services.CalculateCorrelations();
+            string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             Console.WriteLine("Podaj typ rozkładu usług (0 - Random, 1 - Negative Correlation, 2 -  Postive Correlation):");
-            using (var writer = new StreamWriter("output.txt"))
+            using (var writer = new StreamWriter(mydocpath + @"\Obciazenia.txt"))
             {
                 foreach (var line in generator.Generate((Generator.Distribution)Convert.ToInt32(Console.ReadLine())))
                 {

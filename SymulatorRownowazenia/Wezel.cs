@@ -21,12 +21,9 @@ namespace SymulatorRownowazenia
         public List<int> ObslugiwaneUslugi { get; set; }
         //Sumaryczny czas w którym podczas symulacji na węźle nie wykonywało się żadne zadanie
         public int CzasNieaktywnosci { get; set; }
-        //Sposób w jaki kwanty czasu procesora przypisywane są zadaniom na nim się wykonującym. Na razie niewykorzystywane. Kwanty aktualnie 
-        //przydzielane są wariacją na temat algorytmu Round Robin, biorącemu pod uwagę potencjał równobieżnego przetwarzania węzła
-        public int TrybObslugi { get; set; }
         //Ilość kwantów czasu procesora dostępnych w jednostce czasu
         public int MocObliczeniowa { get; set; }
-        //Na razie nie jestem do końca pewny. :) Wedle obecnej implementacji, węzeł będzie starał się rozbić dostępne kwanty procesora na dana liczbę zadań.
+        //Wedle obecnej implementacji, węzeł będzie starał się rozbić dostępne kwanty procesora na dana liczbę zadań.
         //PotencjalRownobieznegoPrzetwarzania musi być mniejszy lub równy MocObliczeniowa.
         public int PotencjalRownobieznegoPrzetwarzania { get; set; }
         //Wykonane kwanty czasu procesora (dodawana wartość po zakończeniu zadania)
