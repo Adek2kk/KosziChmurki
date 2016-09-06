@@ -49,6 +49,10 @@ namespace SymulatorRownowazenia
         //Funkcja wywołująca się raz na kwant czasu, odpowiada za wykonywanie zadań
         public void WykonajKrok()
         {
+            //Żadne z zadań nie otrzymało kwantu czasu w tym cyklu
+            foreach (Podzadanie podzad in PrzypisaneZadania)
+            { podzad.CzyOtrzymano = 0; }
+
             //Zadanie któremu przyporządkujemy kwant czasu
             int j = 0;
             //Maksymalne ID zadania do którego możemy się odwołać
@@ -60,25 +64,31 @@ namespace SymulatorRownowazenia
                 {
                     Podzadanie zadanieWykonywane = PrzypisaneZadania.ElementAt(j);
                     bool zakonczone = NadajKwant(zadanieWykonywane);
+                    zadanieWykonywane.CzyOtrzymano = 1;
                     if (zakonczone)
                     {
                         //Wyrzucamy podzadanie z węzła
                         WykonaneKwantyCzasu += zadanieWykonywane.WymaganyCzasPrzetwarzania;
                         PrzypisaneZadania.RemoveAt(j);
+                        //Jeśli usuwamy zadanie musimy zmniejszyć iterator o 1 aby niczego nie przeskoczyć. Możemy to zrobić nawet jeśli zadanie było zerowe - za chwilę i tak podnisiemy j o 1
+                        j--;
                         makszadid = Math.Min(PrzypisaneZadania.Count(), PotencjalRownobieznegoPrzetwarzania) - 1;
                     }
 
-                    if (j >= makszadid) j = 0;
+                    if (j >= makszadid) { j = 0; }
                     else j++;
                 }
             }
 
 
-            for (int i = makszadid + 1; i < PrzypisaneZadania.Count(); i++)
-            {
-                Podzadanie zadanieWykonywane = PrzypisaneZadania.ElementAt(i);
-                zadanieWykonywane.krok(false);
-            }
+                for (int i = 0; i < PrzypisaneZadania.Count(); i++)
+                {
+                    Podzadanie zadanieWykonywane = PrzypisaneZadania.ElementAt(i);
+                    if (zadanieWykonywane.CzyOtrzymano == 0)
+                    {
+                        zadanieWykonywane.krok(false);
+                    }
+                }
 
         }
     }

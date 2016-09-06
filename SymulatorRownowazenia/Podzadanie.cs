@@ -23,6 +23,8 @@ namespace SymulatorRownowazenia
         public int CzasOczekiwania { get; set; }
         //Moment nadejścia danego (pod)zadania do systemu
         public int ChwilaNadejscia { get; set; }
+        //Przechowuje informacje o tym czy w danym cyklu przetwarzanie podzadanie otrzymało kwant czasu.
+        public int CzyOtrzymano { get; set; }
 
         public void krok(bool wykonywane)
         {
