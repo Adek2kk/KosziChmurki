@@ -52,6 +52,9 @@ namespace SymulatorRownowazenia
             //Żadne z zadań nie otrzymało kwantu czasu w tym cyklu
             foreach (Podzadanie podzad in PrzypisaneZadania)
             { podzad.CzyOtrzymano = 0; }
+            //Licznik zadań zakończonych w tym przebiegu. Wykorzystywany przy wyznaczaniu zadań które można obsługiwać.
+            int licznikzadanzakonczonych = 0;
+
 
             //Zadanie któremu przyporządkujemy kwant czasu
             int j = 0;
@@ -60,19 +63,22 @@ namespace SymulatorRownowazenia
 
             for (int i = 0; i < MocObliczeniowa; i++)
             {
-                if (PrzypisaneZadania.Count() > 0)
+                //Makszadid może być mniejsze od 0 tylko jeśli ukończyliśmy już w danym przebiegu tyle zadań ile wynosi potencjał równobieżnego przetwarzania
+                if (PrzypisaneZadania.Count() > 0 && makszadid >= 0)
                 {
                     Podzadanie zadanieWykonywane = PrzypisaneZadania.ElementAt(j);
                     bool zakonczone = NadajKwant(zadanieWykonywane);
                     zadanieWykonywane.CzyOtrzymano = 1;
                     if (zakonczone)
                     {
-                        //Wyrzucamy podzadanie z węzła
                         WykonaneKwantyCzasu += zadanieWykonywane.WymaganyCzasPrzetwarzania;
+                        licznikzadanzakonczonych ++;
+                        //Wyrzucamy podzadanie z węzła
                         PrzypisaneZadania.RemoveAt(j);
                         //Jeśli usuwamy zadanie musimy zmniejszyć iterator o 1 aby niczego nie przeskoczyć. Możemy to zrobić nawet jeśli zadanie było zerowe - za chwilę i tak podnisiemy j o 1
                         j--;
-                        makszadid = Math.Min(PrzypisaneZadania.Count(), PotencjalRownobieznegoPrzetwarzania) - 1;
+                        //Od potencjału równobieżnego przetwarzania odejmujemy ilość ukończonych zadań tak aby nagle nie pojawiło nam sięnowe.
+                        makszadid = Math.Min(PrzypisaneZadania.Count(), (PotencjalRownobieznegoPrzetwarzania - licznikzadanzakonczonych)) - 1;
                     }
 
                     if (j >= makszadid) { j = 0; }
