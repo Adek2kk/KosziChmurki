@@ -153,6 +153,7 @@ namespace SymulatorRownowazenia
                         nowywezel.ObslugiwaneUslugi = new List<int>();
                         nowywezel.DlugosciPrzypisanychZadan = new List<double>();
                         nowywezel.FragmentyPrzypisanychZadan = new List<int>();
+                        nowywezel.WspolczynnikObciazenia = 0;
 
                         int tmp;
                         int ilosczadan;
@@ -212,9 +213,11 @@ namespace SymulatorRownowazenia
             //Wyszukuje wszystkie węzły obsługujące daną usługę
             List<Wezel> ZUsluga = Wezly.Where(e => e.ObslugiwaneUslugi.Contains(usluga)).ToList();
             //Usuwa z listy węzły które już zostały wykorzystane przy zapewnianiu kworum
-            List<Wezel> ZUslugaClean = ZUsluga.Where(e => !(wykorzystane.Contains(e.IDWezla))).ToList(); 
+            List<Wezel> ZUslugaClean = ZUsluga.Where(e => !(wykorzystane.Contains(e.IDWezla))).ToList();
+            //Sortuje węzły na liście po ich współczynnikach obciążenia
+            List<Wezel> ZUslugaCleanSort = ZUslugaClean.OrderBy(e => e.WspolczynnikObciazenia).ToList();
             //Zwraca ID węzła o najniższej wartości stosunku ilości przypisanych zadań do mocy obliczeniowej
-            return ZUslugaClean.OrderBy(e => e.PrzypisaneZadania.Count() / e.MocObliczeniowa).First().IDWezla;   
+            return ZUslugaCleanSort.First().IDWezla;   
         }
 
 
@@ -290,6 +293,7 @@ namespace SymulatorRownowazenia
                         WybranyWezel.SumaCzasowPrzypisanychZadan = WybranyWezel.SumaCzasowPrzypisanychZadan + exec.WymaganyCzasPrzetwarzania;
                         WybranyWezel.DlugosciPrzypisanychZadan.Add(Convert.ToDouble(exec.WymaganyCzasPrzetwarzania));
                         WybranyWezel.FragmentyPrzypisanychZadan.Add(exec.IDuslugi);
+                        WybranyWezel.ObliczWspolczynnikObciazenia();
                     }
 
                     ZadaniaPrzetwarzane.Add(nadchodzace);

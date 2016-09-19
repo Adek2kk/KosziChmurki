@@ -34,14 +34,20 @@ namespace SymulatorRownowazenia
         public List<double> DlugosciPrzypisanychZadan { get; set; }
         //Do obliczania parametrów - spisywane są tu fragmenty do których odnoszą się kolejne zadania
         public List<int> FragmentyPrzypisanychZadan { get; set; }
+        //Współczynnik określający obciążenie danego węzła - ilość znajdującyh się na nim zadań przez moc obliczeniową.
+        public double WspolczynnikObciazenia { get; set; }
 
 
+        public void ObliczWspolczynnikObciazenia()
+        {
+            WspolczynnikObciazenia = (System.Convert.ToDouble(PrzypisaneZadania.Count()) / System.Convert.ToDouble(MocObliczeniowa));
+        }
 
         //Funkcja przypisuje kwant czasu procesora danemu zadaniu, po czym zwraca 'true' jeżeli zadanie zostało zakończone, 'false' w przeciwnym razie
         public bool NadajKwant(Podzadanie zadanieDocelowe)
         {
             zadanieDocelowe.krok(true);
-
+            zadanieDocelowe.CzyOtrzymano = 1;
             if (zadanieDocelowe.Zakonczone == true) return true;
             else return false;
         }
@@ -58,7 +64,7 @@ namespace SymulatorRownowazenia
 
             //Zadanie któremu przyporządkujemy kwant czasu
             int j = 0;
-            //Maksymalne ID zadania do którego możemy się odwołać
+            //Maksymalna pozycja zadania do którego możemy się odwołać
             int makszadid = Math.Min(PrzypisaneZadania.Count(), PotencjalRownobieznegoPrzetwarzania)-1;
 
             for (int i = 0; i < MocObliczeniowa; i++)
@@ -68,14 +74,14 @@ namespace SymulatorRownowazenia
                 {
                     Podzadanie zadanieWykonywane = PrzypisaneZadania.ElementAt(j);
                     bool zakonczone = NadajKwant(zadanieWykonywane);
-                    zadanieWykonywane.CzyOtrzymano = 1;
                     if (zakonczone)
                     {
                         WykonaneKwantyCzasu += zadanieWykonywane.WymaganyCzasPrzetwarzania;
                         licznikzadanzakonczonych ++;
                         //Wyrzucamy podzadanie z węzła
                         PrzypisaneZadania.RemoveAt(j);
-                        //Jeśli usuwamy zadanie musimy zmniejszyć iterator o 1 aby niczego nie przeskoczyć. Możemy to zrobić nawet jeśli zadanie było zerowe - za chwilę i tak podnisiemy j o 1
+                        ObliczWspolczynnikObciazenia();
+                        //Jeśli usuwamy zadanie musimy zmniejszyć iterator o 1 aby niczego nie przeskoczyć. Możemy to zrobić nawet jeśli zadanie było zerowe - za chwilę i tak podniesiemy j o 1
                         j--;
                         //Od potencjału równobieżnego przetwarzania odejmujemy ilość ukończonych zadań tak aby nagle nie pojawiło nam sięnowe.
                         makszadid = Math.Min(PrzypisaneZadania.Count(), (PotencjalRownobieznegoPrzetwarzania - licznikzadanzakonczonych)) - 1;
