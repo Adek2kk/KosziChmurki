@@ -40,7 +40,7 @@ namespace Node_generator
             string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             Console.WriteLine("Podaj typ rozkładu usług (0 - Random, 1 - Negative Correlation, 2 -  Postive Correlation):");
-            using (var writer = new StreamWriter(mydocpath + @"\Obciazenia.txt"))
+            using (var writer = new StreamWriter(mydocpath + @"\Wezel_gen.txt"))
             {
                 foreach (var line in generator.Generate((Generator.Distribution)Convert.ToInt32(Console.ReadLine())))
                 {

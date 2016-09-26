@@ -114,7 +114,7 @@ namespace SymulatorRownowazenia
 
             try
             {
-                using (StreamReader sr = new StreamReader("Output.txt"))
+                using (StreamReader sr = new StreamReader("Wezel_gen.txt"))
                 {
 
                     //Kworum
